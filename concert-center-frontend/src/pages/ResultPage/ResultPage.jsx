@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { FaCheckCircle, FaHome } from 'react-icons/fa';
@@ -9,18 +9,33 @@ const ResultPage = () => {
   const navigate = useNavigate();
   const { product, quantity } = useSelector((state) => state.cart);
 
+  // Verificar si venimos de Wompi (hay ?id= en la URL)
+  const params = new URLSearchParams(window.location.search);
+  const hasTransactionId = params.get('id');
+
+  // Si NO hay producto en Redux y NO venimos de Wompi, volver al inicio
+  useEffect(() => {
+    if (!product && !hasTransactionId) {
+      navigate('/');
+    }
+  }, [product, hasTransactionId, navigate]);
+
   const handleBackHome = () => {
     dispatch(resetCheckout());
     navigate('/');
   };
 
+  // Si no hay producto en Redux pero venimos de Wompi, mostrar un éxito genérico
+  const displayName = product?.name || 'tu compra';
+  const displayQuantity = product?.quantity || 1;
+
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black text-white flex items-center justify-center">
       <div className="bg-gray-900 p-10 rounded-2xl border border-purple-800 text-center max-w-md w-full">
         <FaCheckCircle className="w-20 h-20 text-purple-400 mx-auto mb-4" />
         <h1 className="text-2xl font-bold mb-2">¡Compra exitosa!</h1>
         <p className="text-gray-400 mb-6">
-          Tu reserva para <strong className="text-white">{product?.name}</strong> ({quantity} {quantity === 1 ? 'boleta' : 'boletas'}) ha sido confirmada.
+          Tu reserva para <strong className="text-white">{displayName}</strong> ({displayQuantity} {displayQuantity === 1 ? 'boleta' : 'boletas'}) ha sido confirmada.
         </p>
         
         <button 

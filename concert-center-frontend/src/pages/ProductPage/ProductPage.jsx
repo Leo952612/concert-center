@@ -12,10 +12,19 @@ const ProductPage = () => {
   const { products, loading } = useSelector((state) => state.product);
   const [selectedCategory, setSelectedCategory] = useState('Todos');
 
-  // ⬇️ LEE LA URL DEL BACKEND DESDE EL .env
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
   const categories = ['Todos', 'Premium', 'VIP', 'General'];
+
+  // ⬇️ NUEVO: Detectar si venimos de Wompi (hay un ?id= en la URL) y redirigir al resultado
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const transactionId = params.get('id');
+
+    if (transactionId) {
+      toast.success('¡Pago procesado!');
+      navigate('/result');
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const controller = new AbortController();
