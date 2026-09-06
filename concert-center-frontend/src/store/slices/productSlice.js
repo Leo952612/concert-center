@@ -2,7 +2,6 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   products: [],
-  selectedProduct: null,
   loading: false,
   error: null,
 };
@@ -14,22 +13,13 @@ const productSlice = createSlice({
     setProducts: (state, action) => {
       state.products = action.payload;
       state.loading = false;
-    },
-    selectProduct: (state, action) => {
-      state.selectedProduct = action.payload;
-    },
-    updateStock: (state, action) => {
-      const { productId, newStock } = action.payload;
-      const product = state.products.find(p => p.id === productId);
-      if (product) {
-        product.stock = newStock;
-      }
-      if (state.selectedProduct?.id === productId) {
-        state.selectedProduct.stock = newStock;
-      }
+      state.error = null; // 👈 AGREGA ESTA LÍNEA
     },
     setLoading: (state, action) => {
       state.loading = action.payload;
+      if (action.payload === true) {
+        state.error = null; // 👈 Y ESTA (opcional, pero buena práctica)
+      }
     },
     setError: (state, action) => {
       state.error = action.payload;
@@ -38,5 +28,5 @@ const productSlice = createSlice({
   },
 });
 
-export const { setProducts, selectProduct, updateStock, setLoading, setError } = productSlice.actions;
+export const { setProducts, setLoading, setError } = productSlice.actions;
 export default productSlice.reducer;
