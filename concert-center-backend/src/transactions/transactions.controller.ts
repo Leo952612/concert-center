@@ -1,5 +1,4 @@
-/* eslint-disable prettier/prettier */
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 
 @Controller('transactions')
@@ -9,6 +8,12 @@ export class TransactionsController {
   @Post('checkout')
   createCheckout(@Body() data: any) {
     return this.transactionsService.createCheckout(data);
+  }
+
+  // ✅ NUEVO ENDPOINT PARA CONSULTAR ESTADO
+  @Get('status/:id')
+  async getStatus(@Param('id') id: string) {
+    return this.transactionsService.getStatus(id);
   }
 
   @Post('confirm')

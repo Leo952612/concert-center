@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Transaction } from './transaction.entity';
 import { EventsService } from '../events/events.service';
 import { ConfigService } from '@nestjs/config';
+import axios from 'axios'; // 👈 AXIOS IMPORTADO
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -45,7 +46,6 @@ export class TransactionsService {
     const concatString = `${reference}${amountInCents}COP${INTEGRITY_SECRET}`;
     const integritySignature = crypto.createHash('sha256').update(concatString).digest('hex');
 
-    // ⚠️ CAMBIO AQUÍ: Redirigir a la raíz (sin /result) para evitar el 404 de Vercel
     const paymentUrl = `https://checkout.co.uat.wompi.dev/p/?public-key=${PUBLIC_KEY}&currency=COP&amount-in-cents=${amountInCents}&reference=${reference}&signature:integrity=${integritySignature}&redirect-url=${encodeURIComponent(frontendUrl + '/result')}`;
 
     console.log(`🚀 URL de pago UAT generada: ${paymentUrl}`);
@@ -57,6 +57,24 @@ export class TransactionsService {
     };
   }
 
+  // ✅ NUEVO MÉTODO PARA CONSULTAR EL ESTADO REAL
+  async getStatus(id: string) {
+    try {
+      const PRIVATE_KEY = this.configService.get<string>('WOMPI_PRIVATE_KEY');
+      const API_URL = this.configService.get<string>('WOMPI_API_URL');
+
+      const response = await axios.get(`${API_URL}/transactions/${id}`, {
+        headers: { Authorization: `Bearer ${PRIVATE_KEY}` },
+      });
+
+      return { success: true, status: response.data.data.status };
+    } catch (error) {
+      console.error('Error consultando estado:', error.response?.data || error.message);
+      return { success: false, status: 'ERROR' };
+    }
+  }
+
+  // Endpoint que el Frontend llama cuando Wompi redirige de vuelta
   async confirmPayment(data: any) {
     const { reference, status, wompiTransactionId, eventId, quantity } = data;
 
