@@ -5,6 +5,7 @@ import { FaTicketAlt } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { setProducts, setLoading, setError } from '../../store/slices/productSlice';
 import { setProduct } from '../../store/slices/cartSlice';
+import { API_URL, CATEGORIES } from '../../config/constants';
 
 const ProductPage = () => {
   const dispatch = useDispatch();
@@ -12,10 +13,6 @@ const ProductPage = () => {
   const { products, loading } = useSelector((state) => state.product);
   const [selectedCategory, setSelectedCategory] = useState('Todos');
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-  const categories = ['Todos', 'Premium', 'VIP', 'General'];
-
-  // ⬇️ SOLO LA CARGA DE PRODUCTOS (Sin lógica de redirección)
   useEffect(() => {
     const controller = new AbortController();
     const loadProducts = async () => {
@@ -65,7 +62,7 @@ const ProductPage = () => {
 
       <section className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex flex-wrap gap-3 justify-center">
-          {categories.map((category) => (
+          {CATEGORIES.map((category) => (
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}

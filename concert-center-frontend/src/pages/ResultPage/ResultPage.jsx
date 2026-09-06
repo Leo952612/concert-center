@@ -3,19 +3,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { FaCheckCircle, FaTimesCircle, FaHome } from 'react-icons/fa';
 import { resetCheckout } from '../../store/slices/cartSlice';
+import { API_URL } from '../../config/constants';
 
 const ResultPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { product, quantity } = useSelector((state) => state.cart);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
   const params = new URLSearchParams(window.location.search);
   const transactionId = params.get('id');
 
   const [transactionStatus, setTransactionStatus] = useState(null);
 
-  // Consultar el estado real de la transacción a Wompi
   useEffect(() => {
     const checkStatus = async () => {
       if (transactionId) {
@@ -42,7 +41,6 @@ const ResultPage = () => {
     navigate('/');
   };
 
-  // Si no hay estado y no venimos de Wompi, mostrar el éxito local
   const displayName = product?.name || 'tu compra';
   const displayQuantity = product?.quantity || 1;
 

@@ -23,9 +23,7 @@ const PaymentPage = () => {
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  // Al quitar los amigos, la cantidad siempre es 1
-  const totalQuantity = 1;
-  const totalToPay = product ? product.price * totalQuantity : 0;
+  const totalToPay = product ? product.price : 0;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -44,13 +42,10 @@ const PaymentPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black text-white py-10">
       <div className="max-w-md mx-auto px-4">
-        
-        {/* Botón de volver */}
         <button onClick={() => navigate('/')} className="flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition-colors">
           <FaArrowLeft /> Volver a eventos
         </button>
 
-        {/* Mini tarjeta del evento (Contexto) */}
         <div className="flex items-center gap-4 bg-gray-800/50 border border-gray-700/50 rounded-2xl p-4 mb-8 backdrop-blur-sm">
           <img src={product.image} alt={product.name} className="w-16 h-16 rounded-xl object-cover shadow-lg" />
           <div className="flex-1">
@@ -63,8 +58,6 @@ const PaymentPage = () => {
         <h1 className="text-2xl font-bold mb-6 text-white">Datos de Entrega</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          
-          {/* Información de envío */}
           <div className="bg-gray-900/70 border border-gray-700/50 rounded-2xl p-6 space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Nombre completo</label>
@@ -127,7 +120,6 @@ const PaymentPage = () => {
             </div>
           </div>
 
-          {/* Bloque de Total */}
           <div className="bg-gray-900/70 border border-gray-700/50 rounded-2xl p-6">
             <div className="flex justify-between items-center mb-2">
               <span className="text-gray-400">Tu inscripción (1 boleta)</span>
@@ -139,7 +131,6 @@ const PaymentPage = () => {
             </div>
           </div>
 
-          {/* Botón estilo Premium */}
           <button 
             type="submit" 
             className="w-full py-4 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white rounded-xl font-bold text-lg hover:from-purple-500 hover:to-fuchsia-500 transition-all shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 flex items-center justify-center gap-2"

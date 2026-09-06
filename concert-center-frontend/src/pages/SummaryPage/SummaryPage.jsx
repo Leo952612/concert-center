@@ -2,20 +2,15 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { FaArrowLeft, FaTicketAlt, FaCreditCard, FaMapMarkerAlt, FaUser } from 'react-icons/fa';
+import { FaArrowLeft, FaCreditCard, FaMapMarkerAlt, FaUser } from 'react-icons/fa';
+import { API_URL, BASE_FEE, DELIVERY_FEE } from '../../config/constants';
 
 const SummaryPage = () => {
   const navigate = useNavigate();
   const { product, quantity, deliveryInfo } = useSelector((state) => state.cart);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
-  const BASE_FEE = 5000;
-  const DELIVERY_FEE = 8000;
-  
   const subtotal = product ? product.price * quantity : 0;
   const total = subtotal + BASE_FEE + DELIVERY_FEE;
-  const numFriends = quantity - 1;
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -69,7 +64,6 @@ const SummaryPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black text-white py-10">
       <div className="max-w-md mx-auto px-4">
-        
         <button onClick={() => navigate('/payment')} className="flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition-colors">
           <FaArrowLeft /> Volver a pago
         </button>
