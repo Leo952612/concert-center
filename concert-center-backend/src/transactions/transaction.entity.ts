@@ -1,6 +1,3 @@
-/* eslint-disable prettier/prettier */
-// eslint-disable-next-line prettier/prettier
-// eslint-disable-next-line prettier/prettier
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -22,4 +19,11 @@ export class Transaction {
 
   @Column({ nullable: true })
   wompi_transaction_id: string;
+
+  // ⬇️ NUEVOS CAMPOS PARA ACTUALIZAR EL STOCK
+  @Column({ nullable: true })
+  eventId: number;
+
+  @Column({ nullable: true })
+  quantity: number;
 }

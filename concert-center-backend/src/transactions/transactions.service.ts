@@ -35,6 +35,9 @@ export class TransactionsService {
       status: 'PENDING',
       amount: totalAmount,
       customer_email: deliveryInfo.email,
+      // ⬇️ AGREGAR ESTO
+      eventId: eventId,
+      quantity: quantity, 
     });
     await this.transactionRepository.save(transaction);
 
@@ -58,7 +61,7 @@ export class TransactionsService {
   }
 
   // ✅ NUEVO MÉTODO PARA CONSULTAR EL ESTADO REAL
-  async getStatus(id: string) {
+   async getStatus(id: string) {
     try {
       const PRIVATE_KEY = this.configService.get<string>('WOMPI_PRIVATE_KEY');
       const API_URL = this.configService.get<string>('WOMPI_API_URL');
@@ -67,7 +70,26 @@ export class TransactionsService {
         headers: { Authorization: `Bearer ${PRIVATE_KEY}` },
       });
 
-      return { success: true, status: response.data.data.status };
+      const wompiStatus = response.data.data.status;
+      const wompiReference = response.data.data.reference;
+
+      // ✅ LÓGICA NUEVA: Si Wompi aprobó, actualizamos la BD y el stock
+      if (wompiStatus === 'APPROVED') {
+        const localTx = await this.transactionRepository.findOne({ where: { reference: wompiReference } });
+
+        if (localTx && localTx.status !== 'APPROVED') {
+          localTx.status = 'APPROVED';
+          localTx.wompi_transaction_id = id;
+          await this.transactionRepository.save(localTx);
+
+          // Actualizar el stock del evento
+          if (localTx.eventId && localTx.quantity) {
+            await this.eventsService.updateStock(localTx.eventId, localTx.quantity);
+          }
+        }
+      }
+
+      return { success: true, status: wompiStatus };
     } catch (error) {
       console.error('Error consultando estado:', error.response?.data || error.message);
       return { success: false, status: 'ERROR' };
