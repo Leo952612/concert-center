@@ -6,44 +6,45 @@ jest.mock('@nestjs/typeorm', () => ({
 // Mock de @nestjs/config para evitar errores de ESM
 jest.mock('@nestjs/config', () => ({
   ConfigService: jest.fn().mockImplementation(() => ({
-    get: jest.fn(() => 'test-value'),
+    get: jest.fn((key: string) => {
+      if (key === 'WOMPI_API_URL') return 'https://test-url.com';
+      if (key === 'WOMPI_PRIVATE_KEY') return 'test-private-key';
+      return 'test-secret';
+    }),
   })),
 }));
 
 // Mock de axios
 jest.mock('axios', () => ({
   post: jest.fn().mockRejectedValue(new Error('API Error')),
-  get: jest.fn().mockResolvedValue({ data: { data: { status: 'APPROVED' } } }),
+  get: jest.fn().mockResolvedValue({ data: { data: { status: 'APPROVED', reference: 'test-ref' } } }),
 }));
 
 import { TransactionsService } from './transactions.service';
 
-// ⬇️ DEFINIMOS EL MOCK CONFIG GLOBALMENTE (para que nunca sea undefined)
-const mockConfig = {
-  get: jest.fn((key: string) => {
-    if (key === 'WOMPI_API_URL') return 'https://test-url.com';
-    if (key === 'WOMPI_PRIVATE_KEY') return 'test-private-key';
-    return 'test-secret';
-  }),
-};
-
-const mockTxRepo = {
-  create: jest.fn((dto) => dto),
-  save: jest.fn((dto) => Promise.resolve({ id: 1, ...dto })),
-  findOne: jest.fn(),
-};
-
-let mockEventsService: { updateStock: jest.Mock };
-
 describe('TransactionsService', () => {
   let service: TransactionsService;
+  let mockEventsService: { updateStock: jest.Mock };
+
+  const mockTxRepo = {
+    create: jest.fn((dto) => dto),
+    save: jest.fn((dto) => Promise.resolve({ id: 1, ...dto })),
+    findOne: jest.fn().mockResolvedValue({ id: 1, status: 'PENDING', reference: 'test-ref', eventId: 1, quantity: 2 }),
+  };
+
+  const mockConfig = {
+    get: jest.fn((key: string) => {
+      if (key === 'WOMPI_API_URL') return 'https://test-url.com';
+      if (key === 'WOMPI_PRIVATE_KEY') return 'test-private-key';
+      return 'test-secret';
+    }),
+  };
 
   beforeEach(() => {
     mockEventsService = {
       updateStock: jest.fn().mockResolvedValue(true),
     };
 
-    // ⬇️ PASAMOS LOS TRES MOCKS AL CONSTRUCTOR
     service = new TransactionsService(
       mockTxRepo as any,
       mockEventsService as any,
