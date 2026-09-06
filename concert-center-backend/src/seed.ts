@@ -1,11 +1,11 @@
-/* eslint-disable prettier/prettier */
-// eslint-disable-next-line prettier/prettier
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DataSource } from 'typeorm';
 import { Event } from './events/event.entity';
 
 async function bootstrap() {
+  const logger = new Logger('Seed');
   const app = await NestFactory.createApplicationContext(AppModule);
   const dataSource = app.get(DataSource);
   const eventRepo = dataSource.getRepository(Event);
@@ -20,7 +20,8 @@ async function bootstrap() {
   for (const event of events) {
     await eventRepo.save(eventRepo.create(event));
   }
-  console.log('🎵 Base de datos sembrada con eventos');
+  
+  logger.log('Base de datos sembrada con eventos');
   await app.close();
 }
 

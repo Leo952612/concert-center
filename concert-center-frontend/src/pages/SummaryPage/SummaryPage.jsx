@@ -51,8 +51,7 @@ const SummaryPage = () => {
       } else {
         toast.error(data.message || 'Error al crear la transacción');
       }
-    } catch (error) {
-      console.error(error);
+    } catch {
       toast.error('Error de conexión con el servidor');
     } finally {
       setIsLoading(false);

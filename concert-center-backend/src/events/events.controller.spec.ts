@@ -1,11 +1,10 @@
-// Mock para evitar el error de ESM
-jest.mock('@nestjs/typeorm', () => ({
-  InjectRepository: () => () => {},
-}));
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { EventsController } from './events.controller';
 import { EventsService } from './events.service';
+
+jest.mock('@nestjs/typeorm', () => ({
+  InjectRepository: () => () => {},
+}));
 
 describe('EventsController', () => {
   let controller: EventsController;
@@ -26,11 +25,11 @@ describe('EventsController', () => {
     controller = module.get<EventsController>(EventsController);
   });
 
-  it('debería devolver todos los eventos', async () => {
+  it('should return all events', async () => {
     expect(await controller.findAll()).toEqual([{ id: 1, name: 'Test' }]);
   });
 
-  it('debería devolver un evento por ID', async () => {
+  it('should return an event by ID', async () => {
     expect(await controller.findOne('1')).toEqual({ id: 1, name: 'Test' });
   });
 });

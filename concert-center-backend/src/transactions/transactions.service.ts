@@ -1,14 +1,16 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Transaction } from './transaction.entity';
 import { EventsService } from '../events/events.service';
 import { ConfigService } from '@nestjs/config';
-import axios from 'axios'; // 👈 AXIOS IMPORTADO
+import axios from 'axios';
 import * as crypto from 'crypto';
 
 @Injectable()
 export class TransactionsService {
+  private readonly logger = new Logger(TransactionsService.name);
+
   constructor(
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
@@ -35,9 +37,8 @@ export class TransactionsService {
       status: 'PENDING',
       amount: totalAmount,
       customer_email: deliveryInfo.email,
-      // ⬇️ AGREGAR ESTO
       eventId: eventId,
-      quantity: quantity, 
+      quantity: quantity,
     });
     await this.transactionRepository.save(transaction);
 
@@ -51,7 +52,7 @@ export class TransactionsService {
 
     const paymentUrl = `https://checkout.co.uat.wompi.dev/p/?public-key=${PUBLIC_KEY}&currency=COP&amount-in-cents=${amountInCents}&reference=${reference}&signature:integrity=${integritySignature}&redirect-url=${encodeURIComponent(frontendUrl + '/result')}`;
 
-    console.log(`🚀 URL de pago UAT generada: ${paymentUrl}`);
+    this.logger.log(`URL de pago generada correctamente para: ${reference}`);
 
     return {
       success: true,
@@ -60,8 +61,7 @@ export class TransactionsService {
     };
   }
 
-  // ✅ NUEVO MÉTODO PARA CONSULTAR EL ESTADO REAL
-   async getStatus(id: string) {
+  async getStatus(id: string) {
     try {
       const PRIVATE_KEY = this.configService.get<string>('WOMPI_PRIVATE_KEY');
       const API_URL = this.configService.get<string>('WOMPI_API_URL');
@@ -73,7 +73,6 @@ export class TransactionsService {
       const wompiStatus = response.data.data.status;
       const wompiReference = response.data.data.reference;
 
-      // ✅ LÓGICA NUEVA: Si Wompi aprobó, actualizamos la BD y el stock
       if (wompiStatus === 'APPROVED') {
         const localTx = await this.transactionRepository.findOne({ where: { reference: wompiReference } });
 
@@ -82,7 +81,6 @@ export class TransactionsService {
           localTx.wompi_transaction_id = id;
           await this.transactionRepository.save(localTx);
 
-          // Actualizar el stock del evento
           if (localTx.eventId && localTx.quantity) {
             await this.eventsService.updateStock(localTx.eventId, localTx.quantity);
           }
@@ -91,12 +89,11 @@ export class TransactionsService {
 
       return { success: true, status: wompiStatus };
     } catch (error) {
-      console.error('Error consultando estado:', error.response?.data || error.message);
+      this.logger.error(`Error consultando estado: ${error.response?.data || error.message}`);
       return { success: false, status: 'ERROR' };
     }
   }
 
-  // Endpoint que el Frontend llama cuando Wompi redirige de vuelta
   async confirmPayment(data: any) {
     const { reference, status, wompiTransactionId, eventId, quantity } = data;
 

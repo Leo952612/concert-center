@@ -13,12 +13,12 @@ const productSlice = createSlice({
     setProducts: (state, action) => {
       state.products = action.payload;
       state.loading = false;
-      state.error = null; // 👈 AGREGA ESTA LÍNEA
+      state.error = null;
     },
     setLoading: (state, action) => {
       state.loading = action.payload;
       if (action.payload === true) {
-        state.error = null; // 👈 Y ESTA (opcional, pero buena práctica)
+        state.error = null;
       }
     },
     setError: (state, action) => {

@@ -32,12 +32,5 @@ const transactionSlice = createSlice({
   },
 });
 
-// ✅ ESTO ES LO IMPORTANTE - EXPORT DEFAULT
-export const { 
-  startTransaction, 
-  processingTransaction, 
-  completeTransaction, 
-  resetTransaction 
-} = transactionSlice.actions;
-
-export default transactionSlice.reducer; // ← ESTA LÍNEA DEBE EXISTIR
+export const { startTransaction, processingTransaction, completeTransaction, resetTransaction } = transactionSlice.actions;
+export default transactionSlice.reducer;

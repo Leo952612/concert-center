@@ -1,9 +1,9 @@
-// Mock de @nestjs/typeorm para evitar errores de ESM
+// Mock to avoid the ESM error in TypeORM
 jest.mock('@nestjs/typeorm', () => ({
   InjectRepository: () => () => {},
 }));
 
-// Mock de @nestjs/config para evitar errores de ESM
+// Mock to avoid the ESM error in ConfigService
 jest.mock('@nestjs/config', () => ({
   ConfigService: jest.fn().mockImplementation(() => ({
     get: jest.fn((key: string) => {
@@ -14,10 +14,9 @@ jest.mock('@nestjs/config', () => ({
   })),
 }));
 
-// Mock de axios
+// Axios mockup
 jest.mock('axios', () => ({
   post: jest.fn().mockRejectedValue(new Error('API Error')),
-  get: jest.fn().mockResolvedValue({ data: { data: { status: 'APPROVED', reference: 'test-ref' } } }),
 }));
 
 import { TransactionsService } from './transactions.service';
@@ -29,7 +28,7 @@ describe('TransactionsService', () => {
   const mockTxRepo = {
     create: jest.fn((dto) => dto),
     save: jest.fn((dto) => Promise.resolve({ id: 1, ...dto })),
-    findOne: jest.fn().mockResolvedValue({ id: 1, status: 'PENDING', reference: 'test-ref', eventId: 1, quantity: 2 }),
+    findOne: jest.fn().mockResolvedValue({ id: 1, status: 'PENDING' }),
   };
 
   const mockConfig = {
@@ -52,11 +51,11 @@ describe('TransactionsService', () => {
     );
   });
 
-  it('debería lanzar error si faltan datos', async () => {
+  it('should throw an error if data is missing', async () => {
     await expect(service.createCheckout({})).rejects.toThrow('Datos incompletos');
   });
 
-  it('debería confirmar el pago y actualizar stock en caso de éxito (APPROVED)', async () => {
+  it('should confirm payment and update stock on success (APPROVED)', async () => {
     mockTxRepo.findOne.mockResolvedValue({ id: 1, status: 'PENDING' });
     const result = await service.confirmPayment({
       reference: 'test-1',
@@ -69,7 +68,7 @@ describe('TransactionsService', () => {
     expect(mockEventsService.updateStock).toHaveBeenCalledWith(1, 2);
   });
 
-  it('debería actualizar estado a DECLINED si el pago falla', async () => {
+  it('should update status to DECLINED if payment fails', async () => {
     mockTxRepo.findOne.mockResolvedValue({ id: 1, status: 'PENDING' });
     const result = await service.confirmPayment({
       reference: 'test-1',
@@ -82,7 +81,7 @@ describe('TransactionsService', () => {
     expect(mockEventsService.updateStock).not.toHaveBeenCalled();
   });
 
-  it('debería entrar en el fallback (catch) cuando la API falla', async () => {
+  it('should enter fallback (catch) when creating checkout fails', async () => {
     const result = await service.createCheckout({
       eventId: 1,
       quantity: 2,

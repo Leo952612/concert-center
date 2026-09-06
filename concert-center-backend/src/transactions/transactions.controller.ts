@@ -10,7 +10,6 @@ export class TransactionsController {
     return this.transactionsService.createCheckout(data);
   }
 
-  // ✅ NUEVO ENDPOINT PARA CONSULTAR ESTADO
   @Get('status/:id')
   async getStatus(@Param('id') id: string) {
     return this.transactionsService.getStatus(id);

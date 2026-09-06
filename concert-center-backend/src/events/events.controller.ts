@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Controller, Get, Param } from '@nestjs/common';
 import { EventsService } from './events.service';
 

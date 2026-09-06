@@ -14,7 +14,7 @@ const saveState = (state) => {
   try {
     localStorage.setItem('concertState', JSON.stringify(state));
   } catch (err) {
-    console.error("Error guardando estado", err);
+    console.error("Error saving state", err);
   }
 };
 

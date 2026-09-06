@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">68.42% </span>
+                <span class="strong">68.96% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>39/57</span>
+                <span class='fraction'>40/58</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">67.27% </span>
+                <span class="strong">67.85% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>37/55</span>
+                <span class='fraction'>38/56</span>
             </div>
         
             
@@ -176,10 +176,7 @@
 <a name='L111'></a><a href='#L111'>111</a>
 <a name='L112'></a><a href='#L112'>112</a>
 <a name='L113'></a><a href='#L113'>113</a>
-<a name='L114'></a><a href='#L114'>114</a>
-<a name='L115'></a><a href='#L115'>115</a>
-<a name='L116'></a><a href='#L116'>116</a>
-<a name='L117'></a><a href='#L117'>117</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
+<a name='L114'></a><a href='#L114'>114</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
@@ -190,6 +187,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
@@ -219,7 +218,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -242,7 +240,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -254,7 +251,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -262,7 +258,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -274,7 +269,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -295,17 +289,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Injectable, BadRequestException } from '@nestjs/common';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Transaction } from './transaction.entity';
 import { EventsService } from '../events/events.service';
 import { ConfigService } from '@nestjs/config';
-import axios from 'axios'; // 👈 AXIOS IMPORTADO
+import axios from 'axios';
 import * as crypto from 'crypto';
 &nbsp;
 @Injectable()
 export class TransactionsService {
+  private readonly logger = new Logger(TransactionsService.name);
+&nbsp;
   constructor(
     @InjectRepository(Transaction)
     private transactionRepository: Repository&lt;Transaction&gt;,
@@ -332,9 +328,8 @@ export class TransactionsService {
       status: 'PENDING',
       amount: totalAmount,
       customer_email: deliveryInfo.email,
-      // ⬇️ AGREGAR ESTO
       eventId: eventId,
-      quantity: quantity, 
+      quantity: quantity,
     });
     await this.transactionRepository.save(transaction);
 &nbsp;
@@ -348,7 +343,7 @@ export class TransactionsService {
 &nbsp;
     const paymentUrl = `https://checkout.co.uat.wompi.dev/p/?public-key=${PUBLIC_KEY}&amp;currency=COP&amp;amount-in-cents=${amountInCents}&amp;reference=${reference}&amp;signature:integrity=${integritySignature}&amp;redirect-url=${encodeURIComponent(frontendUrl + '/result')}`;
 &nbsp;
-    console.log(`🚀 URL de pago UAT generada: ${paymentUrl}`);
+    this.logger.log(`URL de pago generada correctamente para: ${reference}`);
 &nbsp;
     return {
       success: true,
@@ -357,8 +352,7 @@ export class TransactionsService {
     };
   }
 &nbsp;
-  // ✅ NUEVO MÉTODO PARA CONSULTAR EL ESTADO REAL
-<span class="fstat-no" title="function not covered" >   async </span>getStatus(id: string) {
+<span class="fstat-no" title="function not covered" >  async </span>getStatus(id: string) {
 <span class="cstat-no" title="statement not covered" >    try {</span>
       const PRIVATE_KEY = <span class="cstat-no" title="statement not covered" >this.configService.get&lt;string&gt;('WOMPI_PRIVATE_KEY');</span>
       const API_URL = <span class="cstat-no" title="statement not covered" >this.configService.get&lt;string&gt;('WOMPI_API_URL');</span>
@@ -370,7 +364,6 @@ export class TransactionsService {
       const wompiStatus = <span class="cstat-no" title="statement not covered" >response.data.data.status;</span>
       const wompiReference = <span class="cstat-no" title="statement not covered" >response.data.data.reference;</span>
 &nbsp;
-      // ✅ LÓGICA NUEVA: Si Wompi aprobó, actualizamos la BD y el stock
 <span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (wompiStatus === 'APPROVED') {</span>
         const localTx = <span class="cstat-no" title="statement not covered" >await this.transactionRepository.findOne({ where: { reference: wompiReference } });</span>
 &nbsp;
@@ -379,7 +372,6 @@ export class TransactionsService {
 <span class="cstat-no" title="statement not covered" >          localTx.wompi_transaction_id = id;</span>
 <span class="cstat-no" title="statement not covered" >          await this.transactionRepository.save(localTx);</span>
 &nbsp;
-          // Actualizar el stock del evento
 <span class="cstat-no" title="statement not covered" >          <span class="missing-if-branch" title="if path not taken" >I</span>if (localTx.eventId &amp;&amp; localTx.quantity) {</span>
 <span class="cstat-no" title="statement not covered" >            await this.eventsService.updateStock(localTx.eventId, localTx.quantity);</span>
           }
@@ -388,12 +380,11 @@ export class TransactionsService {
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      return { success: true, status: wompiStatus };</span>
     } catch (error) {
-<span class="cstat-no" title="statement not covered" >      console.error('Error consultando estado:', error.response?.data || error.message);</span>
+<span class="cstat-no" title="statement not covered" >      this.logger.error(`Error consultando estado: ${error.response?.data || error.message}`);</span>
 <span class="cstat-no" title="statement not covered" >      return { success: false, status: 'ERROR' };</span>
     }
   }
 &nbsp;
-  // Endpoint que el Frontend llama cuando Wompi redirige de vuelta
   async confirmPayment(data: any) {
     const { reference, status, wompiTransactionId, eventId, quantity } = data;
 &nbsp;
@@ -418,7 +409,7 @@ export class TransactionsService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-06T21:52:40.405Z
+                at 2026-09-06T23:43:48.343Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

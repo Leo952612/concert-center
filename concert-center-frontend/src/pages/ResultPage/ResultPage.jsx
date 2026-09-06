@@ -26,8 +26,8 @@ const ResultPage = () => {
           } else {
             setTransactionStatus('ERROR');
           }
-        } catch (error) {
-          console.error(error);
+        } catch {
+          setTransactionStatus('ERROR');
         }
       } else if (!product) {
         navigate('/');
