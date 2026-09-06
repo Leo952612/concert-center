@@ -46,7 +46,7 @@ export class TransactionsService {
     const integritySignature = crypto.createHash('sha256').update(concatString).digest('hex');
 
     // ⚠️ CAMBIO AQUÍ: Redirigir a la raíz (sin /result) para evitar el 404 de Vercel
-    const paymentUrl = `https://checkout.co.uat.wompi.dev/p/?public-key=${PUBLIC_KEY}&currency=COP&amount-in-cents=${amountInCents}&reference=${reference}&signature:integrity=${integritySignature}&redirect-url=${encodeURIComponent(frontendUrl)}`;
+    const paymentUrl = `https://checkout.co.uat.wompi.dev/p/?public-key=${PUBLIC_KEY}&currency=COP&amount-in-cents=${amountInCents}&reference=${reference}&signature:integrity=${integritySignature}&redirect-url=${encodeURIComponent(frontendUrl + '/result')}`;
 
     console.log(`🚀 URL de pago UAT generada: ${paymentUrl}`);
 

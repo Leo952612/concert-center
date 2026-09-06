@@ -15,18 +15,8 @@ const ProductPage = () => {
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
   const categories = ['Todos', 'Premium', 'VIP', 'General'];
 
+  // ⬇️ SOLO LA CARGA DE PRODUCTOS (Sin lógica de redirección)
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const transactionId = params.get('id');
-
-    // ⬇️ LÓGICA CORREGIDA: Si venimos de Wompi, redirigimos y NO cargamos productos
-    if (transactionId) {
-      toast.success('¡Pago procesado!');
-      navigate('/result');
-      return;
-    }
-
-    // Si no venimos de Wompi, cargamos los productos normalmente
     const controller = new AbortController();
     const loadProducts = async () => {
       dispatch(setLoading(true));
@@ -43,7 +33,7 @@ const ProductPage = () => {
     };
     loadProducts();
     return () => controller.abort();
-  }, [dispatch, API_URL, navigate]);
+  }, [dispatch, API_URL]);
 
   const filteredProducts = selectedCategory === 'Todos'
     ? products
