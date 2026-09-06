@@ -1,0 +1,17 @@
+# Dependencias
+node_modules/
+
+# Archivos de compilación
+dist/
+build/
+
+# Variables de entorno (¡Nunca subir llaves!)
+.env
+.env.local
+
+# Base de datos local
+db.sqlite
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db

@@ -8,15 +8,14 @@ const SummaryPage = () => {
   const navigate = useNavigate();
   const { product, quantity, deliveryInfo } = useSelector((state) => state.cart);
 
-  // Leer variables del .env
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-  const WOMPI_PUBLIC_KEY = import.meta.env.VITE_WOMPI_PUBLIC_KEY;
 
   const BASE_FEE = 5000;
   const DELIVERY_FEE = 8000;
   
   const subtotal = product ? product.price * quantity : 0;
   const total = subtotal + BASE_FEE + DELIVERY_FEE;
+  const numFriends = quantity - 1;
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -26,20 +25,6 @@ const SummaryPage = () => {
       navigate('/');
     }
   }, [product, deliveryInfo, navigate]);
-
-  const loadWompiScript = () => {
-    return new Promise((resolve) => {
-      if (window.WidgetCheckout) {
-        resolve(true);
-      } else {
-        const script = document.createElement('script');
-        script.src = 'https://checkout.wompi.co/widget.js';
-        script.onload = () => resolve(true);
-        script.onerror = () => resolve(false);
-        document.body.appendChild(script);
-      }
-    });
-  };
 
   const handlePay = async () => {
     setIsLoading(true);
@@ -62,46 +47,9 @@ const SummaryPage = () => {
       const data = await response.json();
 
       if (data.success) {
-        // ⬇️ VALIDACIÓN IMPORTANTE: Solo abrir el widget si hay datos
-        if (data.reference && data.amountInCents) {
-          const isLoaded = await loadWompiScript();
-          if (isLoaded) {
-            const checkout = new WidgetCheckout({
-              currency: 'COP',
-              amountInCents: data.amountInCents,
-              reference: data.reference,
-              publicKey: WOMPI_PUBLIC_KEY,
-              signature: { integrity: data.integritySignature },
-              redirectUrl: 'http://localhost:5173/result',
-              bootstrapTransport: 'postmessage' // Evita el error 403
-            });
-
-            checkout.open(async function (result) {
-              const transaction = result.transaction;
-              if (transaction.status === 'APPROVED') {
-                await fetch(`${API_URL}/transactions/confirm`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    reference: data.reference,
-                    status: transaction.status,
-                    wompiTransactionId: transaction.id,
-                    eventId: product.id,
-                    quantity: quantity
-                  }),
-                });
-                toast.success('¡Pago exitoso!');
-                navigate('/result');
-              } else {
-                toast.error('Pago fallido o rechazado');
-              }
-            });
-          } else {
-            toast.success('¡Pago exitoso!');
-            navigate('/result');
-          }
+        if (data.paymentUrl) {
+          window.location.href = data.paymentUrl;
         } else {
-          // Si el backend NO dio datos del widget, es porque Wompi falló. Simulamos éxito.
           toast.success('¡Pago exitoso!');
           navigate('/result');
         }
