@@ -29,15 +29,20 @@ Este repositorio está estructurado como un Monorepo. Puedes encontrar instrucci
 - **Backend:** 14 tests con Jest. Cobertura >84% en líneas.
 ![alt text](image-1.png)
 
+## 🧪 API Reference (Postman)
+## 🧪 API Reference (Postman)
+Los endpoints de la API fueron probados y documentados. Para facilitar las pruebas, se recomienda importar los endpoints en Postman:
+- `GET https://concert-center-production.up.railway.app/events` - Obtiene eventos.
+![alt text](image-2.png)
+- `POST https://concert-center-production.up.railway.app/transactions/checkout` - Crea transacción.
+![alt text](image-3.png)
+- `GET https://concert-center-production.up.railway.app/transactions/status/:id` - Consulta estado del pago.
+- `GET {{sandbox_url}}/merchants/{{public_key}}` - Prueba para obtener el widget de Wompi.
+![alt text](image-4.png)
+
 ## Seguridad
 - Las llaves privadas y secretas de integración de Wompi se manejan exclusivamente en variables de entorno (`.env`), las cuales están protegidas en `.gitignore` y no se suben al repositorio.
 - Configurado en Railway (Backend) y Vercel (Frontend).
 
 ## Repositorio
 - **GitHub:** https://github.com/Leo952612/concert-center
-
- ## Sube el cambio a GitHub:
-   ```bash
-   git add .
-   git commit -m "Docs: Reemplazar README genérico por documentación del backend"
-   git push origin main

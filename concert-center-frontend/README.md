@@ -11,7 +11,7 @@ Aplicación SPA (Single Page Application) construida con **React, Vite, Redux To
 
 ## Estructura del Proyecto
 ```text
-src/
+** src/
 ├── components/        # (Reservado para componentes reutilizables)
 ├── config/
 │   └── constants.js   # Variables globales (API_URL, tarifas, categorías)
@@ -23,7 +23,7 @@ src/
 ├── store/
 │   └── slices/        # Lógica de Redux (cart, product, transaction)
 ├── App.jsx            # Definición de rutas
-└── main.jsx           # Configuración inicial
+└── main.jsx           # Configuración inicial **
 
 ## Correr el proyecto concert-center-frontend
 - **npm run dev** (Inicia el servidor de desarrollo.)
