@@ -1,3 +1,34 @@
+# Concert Center Frontend
+
+Aplicación SPA (Single Page Application) construida con **React, Vite, Redux Toolkit y Tailwind CSS** para la compra de boletas de conciertos. Se comunica con el backend de NestJS para obtener los eventos y procesar los pagos.
+
+## Tecnologías
+- **React 18** (UI)
+- **Vite** (Build tool)
+- **Redux Toolkit** (Manejo de estado global)
+- **Tailwind CSS** (Estilos)
+- **React Router DOM** (Navegación)
+
+## Estructura del Proyecto
+```text
+src/
+├── components/        # (Reservado para componentes reutilizables)
+├── config/
+│   └── constants.js   # Variables globales (API_URL, tarifas, categorías)
+├── pages/
+│   ├── ProductPage/   # Lista de eventos
+│   ├── PaymentPage/   # Datos de entrega
+│   ├── SummaryPage/   # Resumen y pago
+│   └── ResultPage/    # Resultado final
+├── store/
+│   └── slices/        # Lógica de Redux (cart, product, transaction)
+├── App.jsx            # Definición de rutas
+└── main.jsx           # Configuración inicial
+
+## Correr el proyecto concert-center-frontend
+- **npm run dev** (Inicia el servidor de desarrollo.)
+- **npx vitest run** (Ejecuta los tests de la aplicación.)
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
